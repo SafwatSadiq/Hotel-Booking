@@ -1,34 +1,47 @@
 import pandas as pd
 
-df = pd.read_csv('hotels.csv')
+df = pd.read_csv('hotels.csv', dtype={'id': str})
 
 
 class Hotel:
-    def __init__(self,ID):
-        pass
+    def __init__(self, hotel_ID):
+        self.hotel_ID = hotel_ID
+        self.name = df.loc[df["id"] == hotel_ID, 'name'].squeeze()
     def book(self):
-        pass
-    
-    def view(self):
-        pass
-    
+        """Book a hotel by changing its availability to no"""
+        df.loc[df["id"] == self.hotel_ID, "available"] = 'no'
+        df.to_csv('hotels.csv', index=False)
+            
     def available(self):
-        pass
+        """Check if the hotel is available"""
+        availability = df.loc[df["id"] == self.hotel_ID, "available"].squeeze()
+        if availability == 'yes':
+            return True
+        else:
+            return False
 
 
 class ReservationTicket:
-    def __init__(self, customer_name, hotel_name):
-        pass
+    def __init__(self, customer_name, hotel_obj):
+        self.customer_name = customer_name
+        self.hotel = hotel_obj
+
     def generate(self):
-        pass
+        content = f"""
+        Thank you for your reservation!
+        Here are your booking data:
+        Name: {self.customer_name}
+        Hotel name: {self.hotel.name}
+        """
+        return content
 
-
-id = input("Enter the id of the hotel: ")
-hotel = Hotel(id)
+print(df)
+hotel_id = input("Enter the id of the hotel: ")
+hotel = Hotel(hotel_id)
 if hotel.available():
     hotel.book()
     name = input("Enter your name: ")
-    reservation_ticket = ReservationTicket(name, hotel)
-    reservation_ticket.generate()
+    reservation_ticket = ReservationTicket(customer_name=name, hotel_obj=hotel)
+    print(reservation_ticket.generate())
 else:
     print("Sorry, no reservation")
